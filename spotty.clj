@@ -1,7 +1,11 @@
 #!/usr/bin/env bb
 
-;; Depends on `sp` bash script, found here:
+;; Dependencies:
+
+;; `sp` bash script, found here:
 ;; https://gist.github.com/streetturtle/fa6258f3ff7b17747ee3
+
+;; `gtk3` (for `gtk-launch`)
 
 (require '[clojure.string :as string])
 (require '[clojure.java.shell :as sh])
@@ -27,8 +31,15 @@
   (sh/sh "sp" "open" uri))
 
 (defn open-other-url [url]
-  url
-  )
+  (let [desktop-app (-> "xdg-settings"
+                        (sh/sh "get" "default-web-browser")
+                        :out
+                        string/trim)]
+    (if desktop-app
+      (do
+        (println "found desktop entry to launch:" desktop-app)
+        (sh/sh "/usr/bin/gtk-launch" desktop-app url))
+      (println "no default web browser found via xdg"))))
 
 (let [[url] *command-line-args*]
   (if (is-spotify-url? url)
