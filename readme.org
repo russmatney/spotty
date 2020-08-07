@@ -20,11 +20,6 @@ This might not work for every case - this was developed to see if it would work.
 
 For more on [[https://wiki.archlinux.org/index.php/Desktop_entries][Desktop Entries]].
 
-* Drawbacks
-
-- Somewhat convoluted setup, unless you're already a linux wizard
-- Assumes both the browser and spotify client are already running
-
 * Examples
 
 #+BEGIN_SRC sh
@@ -75,16 +70,26 @@ export BROWSER=/usr/bin/google-chrome-stable
 #+END_SRC
 
 ** Dependencies
-*** bash sp client
-Currently depends on [[https://gist.github.com/streetturtle/fa6258f3ff7b17747ee3][this ~sp~ spotify bash script]].
-
-This dependency will likely be removed with a bit more work.
 *** ~gtk3~ (for ~gtk-launch~)
 This is used to launch the desktop entry of your choice when the passed url is
 not a spotify one.
 
+I installed it via `yay -Sy gtk3`.
+* Drawbacks
+** Convoluted setup, unless you're already a linux wizard.
+You're putting your default browser desktop entry in the Exec line of another...
+** Unknown, unintended consequences of replacing your default browser for xdg-open
+I'm hoping this mitigated by the `gtk-launch` command, which seems to call the
+desktop entry the same as xdg-open would have done in the first place.
+** Assumes both the browser and spotify client are already running
+* Inspired by
+** Sp bash spotify client from @streetturtle
+https://gist.github.com/streetturtle/fa6258f3ff7b17747ee3
+
+Thanks for this!
 * Future work
-** [ ] remove `sp` dependency
+** [X] remove `sp` dependency
 Could probably just fire into spotify dbus directly
 ** [ ] clean up output
 ** [ ] add reasonable help text
+
