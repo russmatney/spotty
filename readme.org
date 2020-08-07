@@ -1,0 +1,6 @@
+#+TITLE: Spotty
+
+A helper for opening spotify urls in a running spotify instance, on linux,
+implemented using clojure and babashka.
+
+Named after the spotify linux client's support for this feature.
