@@ -6,6 +6,9 @@
 (require '[clojure.string :as string])
 (require '[clojure.java.shell :as sh])
 
+(defn is-spotify-url? [url]
+  (-> url (string/includes? "spotify.com")))
+
 (defn url->uri [url]
   (println url)
   (-> url
@@ -20,10 +23,17 @@
   (url->uri "https://open.spotify.com/track/0oks4FnzhNp5QPTZtoet7c?si=9qdFwTT2Tm-54DNT9wWSbA")
   )
 
-(defn open [uri]
+(defn open-spotify-uri [uri]
   (sh/sh "sp" "open" uri))
 
+(defn open-other-url [url]
+  url
+  )
+
 (let [[url] *command-line-args*]
-  (->
-    (url->uri url)
-    open))
+  (if (is-spotify-url? url)
+    (->
+      (url->uri url)
+      open-spotify-uri)
+    (open-other-url url)
+    ))

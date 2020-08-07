@@ -4,3 +4,9 @@ A helper for opening spotify urls in a running spotify instance, on linux,
 implemented using clojure and babashka.
 
 Named after the spotify linux client's support for this feature.
+
+
+* TODO remove `sp` dependency
+Could probably just fire into spotify dbus directly
+* TODO figure out what to do with regular urls
+Calling xdg-open again feels like a loop, b/c that's how this gets called
