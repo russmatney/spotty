@@ -30,21 +30,21 @@
 (defn open-spotify-uri [uri]
   (sh/sh "sp" "open" uri))
 
-(defn open-other-url [url]
-  (let [desktop-app (-> "xdg-settings"
-                        (sh/sh "get" "default-web-browser")
-                        :out
-                        string/trim)]
-    (if desktop-app
-      (do
-        (println "found desktop entry to launch:" desktop-app)
-        (sh/sh "/usr/bin/gtk-launch" desktop-app url))
-      (println "no default web browser found via xdg"))))
+(defn open-other-url
+  "Passes the desktop entry and args to `/usr/bin/gtk-launch`.
+  TODO handle disowning the process after launching from a shell.
+  "
+  [browser-desktop-entry url]
+  (println "Opening url via" browser-desktop-entry)
+  (sh/sh "/usr/bin/gtk-launch" browser-desktop-entry url))
 
-(let [[url] *command-line-args*]
-  (if (is-spotify-url? url)
+(let [url           (-> *command-line-args* first)
+      browser-entry (-> *command-line-args* second)]
+  (cond
+    (is-spotify-url? url)
     (->
       (url->uri url)
       open-spotify-uri)
-    (open-other-url url)
-    ))
+
+    browser-entry
+    (open-other-url browser-entry url)))

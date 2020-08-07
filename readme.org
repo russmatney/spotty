@@ -1,12 +1,90 @@
 #+TITLE: Spotty
 
-A helper for opening spotify urls in a running spotify instance, on linux,
-implemented using clojure and babashka.
+A helper for opening spotify urls in a running spotify instance (rather than in
+a browser), on linux, implemented using clojure and babashka.
 
 Named after the spotify linux client's support for this feature.
 
+* How does this work?
 
-* TODO remove `sp` dependency
+Spotify supports changing the current song via Dbus and spotify uris. So how do
+we use that path when a link is clicked in, say, ~Slack~?
+
+Spotty's approach is to replace the default desktop application that runs when
+handed a url. If the passed url contains ~spotify.com~, it will convert the url
+to a uri, and send the uri to the running spotify client. Otherwise, it will
+open the passed url via whatever .desktop entry you prefer (ex:
+~google-chrome.desktop~, ~firefox.desktop~).
+
+This might not work for every case - this was developed to see if it would work.
+
+For more on [[https://wiki.archlinux.org/index.php/Desktop_entries][Desktop Entries]].
+
+* Drawbacks
+
+- Somewhat convoluted setup, unless you're already a linux wizard
+- Assumes both the browser and spotify client are already running
+
+* Examples
+
+#+BEGIN_SRC sh
+# opens in running Browser instance
+spotty https://wiki.archlinux.org/index.php/Desktop_entries
+
+# opens in running Spotify client
+spotty https://open.spotify.com/track/7oaEjLP2dTJLJsITbAxTOz
+#+END_SRC
+
+* Installation
+
+** Symlink to somewhere on your path
+
+#+BEGIN_SRC sh
+ln -s ~/russmatney/spotty/spotty.clj ~/.local/bin/spotty
+#+END_SRC
+
+#+RESULTS:
+
+** Create a Desktop Entry for spotty
+
+In /usr/share/applications/spotty.desktop.
+
+#+BEGIN_SRC conf
+[Desktop Entry]
+Version=1.0
+Name=Spotty
+GenericName=Spotify then Web Browser
+Comment=Open Spotify if relevant, Browser otherwise
+Exec=/home/russ/.local/bin/spotty %U google-chrome.desktop
+Terminal=false
+Type=Application
+MimeType=x-scheme-handler/http;x-scheme-handler/https;
+#+END_SRC
+
+Note the use of ~google-chrome.desktop~ - the second argument to spotty should
+be your intended 'fallback' desktop entry.
+
+Set ~spotty.desktop~ as your http/https url handler:
+
+#+BEGIN_SRC sh
+unset BROWSER
+xdg-settings set default-web-browser spotty.desktop
+xdg-mime query default x-scheme-handler/https
+xdg-mime query default x-scheme-handler/http
+export BROWSER=/usr/bin/google-chrome-stable
+#+END_SRC
+
+** Dependencies
+*** bash sp client
+Currently depends on [[https://gist.github.com/streetturtle/fa6258f3ff7b17747ee3][this ~sp~ spotify bash script]].
+
+This dependency will likely be removed with a bit more work.
+*** ~gtk3~ (for ~gtk-launch~)
+This is used to launch the desktop entry of your choice when the passed url is
+not a spotify one.
+
+* Future work
+** [ ] remove `sp` dependency
 Could probably just fire into spotify dbus directly
-* TODO figure out what to do with regular urls
-Calling xdg-open again feels like a loop, b/c that's how this gets called
+** [ ] clean up output
+** [ ] add reasonable help text
