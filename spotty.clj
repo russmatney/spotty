@@ -9,7 +9,7 @@
 (require '[clojure.java.shell :as sh])
 
 (defn is-spotify-url? [url]
-  (-> url (string/includes? "spotify.com")))
+  (-> url (string/includes? "https://open.spotify.com")))
 
 (defn url->uri [url]
   (println url)
